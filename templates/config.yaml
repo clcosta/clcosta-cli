@@ -1,0 +1,19 @@
+git:
+  pessoal:
+    - email: "pessoal@github.com"
+      name: "Pessoal"
+  profissional:
+    - email: "work@company.com"
+      name: "Profissional"
+ssh:
+  pessoal:
+    - key: "~/.ssh/id_rsa"
+  profissional:
+    - key: "~/.ssh/id_rsa_work"
+confFiles:
+  pre-commit-config:
+    - active: true
+    - template: ./templates/pre-commit-config.yaml
+  .editorconfig:
+    - active: true
+    - template: ./templates/.editorconfig
