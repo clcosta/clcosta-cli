@@ -39,4 +39,5 @@ func registerCommands(rootCmd *cobra.Command, pklStorage *storage.PklStorage) {
 	rootCmd.AddCommand(newConfigureFilesCmd(config))
 	rootCmd.AddCommand(newConfigureGitUserCmd(config))
 	rootCmd.AddCommand(newConfigureSSHCmd(config))
+	rootCmd.AddCommand(newConfigureB64Cmd())
 }
