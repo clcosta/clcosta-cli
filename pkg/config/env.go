@@ -2,7 +2,10 @@ package config
 
 import (
 	"os"
+	"path/filepath"
 	"runtime"
+
+	"github.com/clcosta/clcosta-cli/pkg/utils"
 )
 
 const (
@@ -17,6 +20,19 @@ type Enviroment struct {
 	BaseYamlConfig string
 }
 
+func pathExists(path string) bool {
+	if _, err := os.Stat(path); os.IsNotExist(err) {
+		return false
+	}
+	return true
+}
+
+func gararanteePathExists(path string) {
+	if !pathExists(path) {
+		os.Mkdir(path, 0755)
+	}
+}
+
 func LoadEnviroment() {
 	currentOs := runtime.GOOS
 	switch currentOs {
@@ -24,25 +40,27 @@ func LoadEnviroment() {
 		path := os.Getenv(ConfigEnviroment)
 		if path == "" {
 			os.Setenv(ConfigEnviroment, os.Getenv("USERPROFILE")+"/.clcosta")
-			if _, err := os.Stat(os.Getenv(ConfigEnviroment)); os.IsNotExist(err) {
-				os.Mkdir(os.Getenv(ConfigEnviroment), 0755)
-			}
 		}
 	case "linux":
 		path := os.Getenv(ConfigEnviroment)
 		if path == "" {
 			os.Setenv(ConfigEnviroment, os.Getenv("HOME")+"/.clcosta")
-			if _, err := os.Stat(os.Getenv(ConfigEnviroment)); os.IsNotExist(err) {
-				os.Mkdir(os.Getenv(ConfigEnviroment), 0755)
-			}
 		}
 	}
 }
 
 func NewEnviromentConfig() *Enviroment {
-	return &Enviroment{
+	env := Enviroment{
 		BaseDir:        os.Getenv(ConfigEnviroment),
 		PklPath:        os.Getenv(ConfigEnviroment) + "/" + ConfigPathPKL,
 		BaseYamlConfig: os.Getenv(ConfigEnviroment) + "/templates/" + ConfigPathYAML,
 	}
+	gararanteePathExists(env.BaseDir)
+	templates := LoadTemplatesEmbed()
+
+	if !pathExists(env.BaseYamlConfig) {
+		gararanteePathExists(filepath.Dir(env.BaseYamlConfig))
+		utils.WriteFile(env.BaseYamlConfig, templates["config"])
+	}
+	return &env
 }
